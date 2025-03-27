@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KechengDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.kecheng_name as kechengName
+        ,a.kecheng_types as kechengTypes
+        ,a.kecheng_photo as kechengPhoto
+        ,a.jiaoshi_id as jiaoshiId
+        ,a.zhuanye_id as zhuanyeId
+        ,a.kecheng_shangke as kechengShangke
+        ,a.kecheng_shichang as kechengShichang
+        ,a.zhuanye_types as zhuanyeTypes
+        ,a.zhuanye_erji_types as zhuanyeErjiTypes
+        ,a.kecheng_content as kechengContent
+        ,a.kecheng_delete as kechengDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KechengView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,jiaoshi.jiaoshi_name as jiaoshiName
+        ,jiaoshi.jiaoshi_types as jiaoshiTypes
+        ,jiaoshi.jiaoshi_photo as jiaoshiPhoto
+        ,jiaoshi.jiaoshi_phone as jiaoshiPhone
+        ,jiaoshi.jiaoshi_shichang as jiaoshiShichang
+        ,jiaoshi.sex_types as sexTypes
+        ,jiaoshi.zhuanye_types as zhuanyeTypes
+        ,jiaoshi.zhuanye_erji_types as zhuanyeErjiTypes
+        ,jiaoshi.jiaoshi_content as jiaoshiContent
+        ,jiaoshi.jiaoshi_delete as jiaoshiDelete
+        ,zhuanye.zhuanye_name as zhuanyeName
+        ,zhuanye.zuanye_types as zuanyeTypes
+        ,zhuanye.zhuanye_photo as zhuanyePhoto
+        ,zhuanye.zhuanye_shangke as zhuanyeShangke
+        ,zhuanye.zhuanye_number as zhuanyeNumber
+        ,zhuanye.zhuanye_types as zhuanyeTypes
+        ,zhuanye.zhuanye_erji_types as zhuanyeErjiTypes
+        ,zhuanye.zhuanye_content as zhuanyeContent
+        ,zhuanye.zhuanye_delete as zhuanyeDelete
+
+        FROM kecheng  a
+        left JOIN jiaoshi jiaoshi ON a.jiaoshi_id = jiaoshi.id
+        left JOIN zhuanye zhuanye ON a.zhuanye_id = zhuanye.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.kechengName != '' and params.kechengName != null and params.kechengName != 'null' ">
+                and a.kecheng_name like CONCAT('%',#{params.kechengName},'%')
+            </if>
+            <if test="params.kechengTypes != null and params.kechengTypes != ''">
+                and a.kecheng_types = #{params.kechengTypes}
+            </if>
+            <if test="params.jiaoshiId != null and params.jiaoshiId != ''">
+                and (
+                    a.jiaoshi_id = #{params.jiaoshiId}
+                )
+            </if>
+            <if test="params.zhuanyeId != null and params.zhuanyeId != ''">
+                and (
+                    a.zhuanye_id = #{params.zhuanyeId}
+                )
+            </if>
+            <if test=" params.kechengShangke != '' and params.kechengShangke != null and params.kechengShangke != 'null' ">
+                and a.kecheng_shangke like CONCAT('%',#{params.kechengShangke},'%')
+            </if>
+            <if test=" params.kechengShichang != '' and params.kechengShichang != null and params.kechengShichang != 'null' ">
+                and a.kecheng_shichang like CONCAT('%',#{params.kechengShichang},'%')
+            </if>
+            <if test="params.zhuanyeTypes != null and params.zhuanyeTypes != ''">
+                and a.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+            <if test="params.zhuanyeErjiTypes != null and params.zhuanyeErjiTypes != ''">
+                and a.zhuanye_erji_types = #{params.zhuanyeErjiTypes}
+            </if>
+            <if test=" params.kechengContent != '' and params.kechengContent != null and params.kechengContent != 'null' ">
+                and a.kecheng_content like CONCAT('%',#{params.kechengContent},'%')
+            </if>
+            <if test="params.kechengDeleteStart != null and params.kechengDeleteStart != ''">
+                <![CDATA[  and a.kecheng_delete >= #{params.kechengDeleteStart}   ]]>
+            </if>
+            <if test="params.kechengDeleteEnd != null and params.kechengDeleteEnd != ''">
+                <![CDATA[  and a.kecheng_delete <= #{params.kechengDeleteEnd}   ]]>
+            </if>
+             <if test="params.kechengDelete != null and params.kechengDelete != ''">
+                and a.kecheng_delete = #{params.kechengDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断教师信息的id不为空 -->
+            <if test=" params.jiaoshiIdNotNull != '' and params.jiaoshiIdNotNull != null and params.jiaoshiIdNotNull != 'null' ">
+                and a.jiaoshi_id IS NOT NULL
+            </if>
+            <if test=" params.jiaoshiName != '' and params.jiaoshiName != null and params.jiaoshiName != 'null' ">
+                and jiaoshi.jiaoshi_name like CONCAT('%',#{params.jiaoshiName},'%')
+            </if>
+            <if test="params.jiaoshiTypes != null  and params.jiaoshiTypes != ''">
+                and jiaoshi.jiaoshi_types = #{params.jiaoshiTypes}
+            </if>
+
+            <if test=" params.jiaoshiPhone != '' and params.jiaoshiPhone != null and params.jiaoshiPhone != 'null' ">
+                and jiaoshi.jiaoshi_phone like CONCAT('%',#{params.jiaoshiPhone},'%')
+            </if>
+            <if test=" params.jiaoshiShichang != '' and params.jiaoshiShichang != null and params.jiaoshiShichang != 'null' ">
+                and jiaoshi.jiaoshi_shichang like CONCAT('%',#{params.jiaoshiShichang},'%')
+            </if>
+            <if test="params.sexTypes != null  and params.sexTypes != ''">
+                and jiaoshi.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test="params.zhuanyeTypes != null  and params.zhuanyeTypes != ''">
+                and jiaoshi.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+
+            <if test="params.zhuanyeErjiTypes != null  and params.zhuanyeErjiTypes != ''">
+                and jiaoshi.zhuanye_erji_types = #{params.zhuanyeErjiTypes}
+            </if>
+
+            <if test=" params.jiaoshiContent != '' and params.jiaoshiContent != null and params.jiaoshiContent != 'null' ">
+                and jiaoshi.jiaoshi_content like CONCAT('%',#{params.jiaoshiContent},'%')
+            </if>
+            <if test="params.jiaoshiDeleteStart != null  and params.jiaoshiDeleteStart != '' ">
+                <![CDATA[  and jiaoshi.jiaoshi_delete >= #{params.jiaoshiDeleteStart}   ]]>
+            </if>
+            <if test="params.jiaoshiDeleteEnd != null  and params.jiaoshiDeleteEnd != '' ">
+                <![CDATA[  and jiaoshi.jiaoshi_delete <= #{params.jiaoshiDeleteEnd}   ]]>
+            </if>
+            <if test="params.jiaoshiDelete != null  and params.jiaoshiDelete != '' ">
+                and jiaoshi.jiaoshi_delete = #{params.jiaoshiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiaoshi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiaoshi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断专业信息的id不为空 -->
+            <if test=" params.zhuanyeIdNotNull != '' and params.zhuanyeIdNotNull != null and params.zhuanyeIdNotNull != 'null' ">
+                and a.zhuanye_id IS NOT NULL
+            </if>
+            <if test=" params.zhuanyeName != '' and params.zhuanyeName != null and params.zhuanyeName != 'null' ">
+                and zhuanye.zhuanye_name like CONCAT('%',#{params.zhuanyeName},'%')
+            </if>
+            <if test="params.zuanyeTypes != null  and params.zuanyeTypes != ''">
+                and zhuanye.zuanye_types = #{params.zuanyeTypes}
+            </if>
+
+            <if test=" params.zhuanyeShangke != '' and params.zhuanyeShangke != null and params.zhuanyeShangke != 'null' ">
+                and zhuanye.zhuanye_shangke like CONCAT('%',#{params.zhuanyeShangke},'%')
+            </if>
+            <if test="params.zhuanyeNumberStart != null  and params.zhuanyeNumberStart != '' ">
+                <![CDATA[  and zhuanye.zhuanye_number >= #{params.zhuanyeNumberStart}   ]]>
+            </if>
+            <if test="params.zhuanyeNumberEnd != null  and params.zhuanyeNumberEnd != '' ">
+                <![CDATA[  and zhuanye.zhuanye_number <= #{params.zhuanyeNumberEnd}   ]]>
+            </if>
+            <if test="params.zhuanyeNumber != null  and params.zhuanyeNumber != '' ">
+                and zhuanye.zhuanye_number = #{params.zhuanyeNumber}
+            </if>
+            <if test="params.zhuanyeTypes != null  and params.zhuanyeTypes != ''">
+                and zhuanye.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+
+            <if test="params.zhuanyeErjiTypes != null  and params.zhuanyeErjiTypes != ''">
+                and zhuanye.zhuanye_erji_types = #{params.zhuanyeErjiTypes}
+            </if>
+
+            <if test=" params.zhuanyeContent != '' and params.zhuanyeContent != null and params.zhuanyeContent != 'null' ">
+                and zhuanye.zhuanye_content like CONCAT('%',#{params.zhuanyeContent},'%')
+            </if>
+            <if test="params.zhuanyeDeleteStart != null  and params.zhuanyeDeleteStart != '' ">
+                <![CDATA[  and zhuanye.zhuanye_delete >= #{params.zhuanyeDeleteStart}   ]]>
+            </if>
+            <if test="params.zhuanyeDeleteEnd != null  and params.zhuanyeDeleteEnd != '' ">
+                <![CDATA[  and zhuanye.zhuanye_delete <= #{params.zhuanyeDeleteEnd}   ]]>
+            </if>
+            <if test="params.zhuanyeDelete != null  and params.zhuanyeDelete != '' ">
+                and zhuanye.zhuanye_delete = #{params.zhuanyeDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zhuanye.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zhuanye.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

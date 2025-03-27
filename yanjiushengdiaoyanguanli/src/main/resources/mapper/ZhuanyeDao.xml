@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhuanyeDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zhuanye_name as zhuanyeName
+        ,a.zuanye_types as zuanyeTypes
+        ,a.zhuanye_photo as zhuanyePhoto
+        ,a.zhuanye_shangke as zhuanyeShangke
+        ,a.zhuanye_number as zhuanyeNumber
+        ,a.zhuanye_types as zhuanyeTypes
+        ,a.zhuanye_erji_types as zhuanyeErjiTypes
+        ,a.zhuanye_content as zhuanyeContent
+        ,a.zhuanye_delete as zhuanyeDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhuanyeView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM zhuanye  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.zhuanyeName != '' and params.zhuanyeName != null and params.zhuanyeName != 'null' ">
+                and a.zhuanye_name like CONCAT('%',#{params.zhuanyeName},'%')
+            </if>
+            <if test="params.zuanyeTypes != null and params.zuanyeTypes != ''">
+                and a.zuanye_types = #{params.zuanyeTypes}
+            </if>
+            <if test=" params.zhuanyeShangke != '' and params.zhuanyeShangke != null and params.zhuanyeShangke != 'null' ">
+                and a.zhuanye_shangke like CONCAT('%',#{params.zhuanyeShangke},'%')
+            </if>
+            <if test="params.zhuanyeNumberStart != null and params.zhuanyeNumberStart != ''">
+                <![CDATA[  and a.zhuanye_number >= #{params.zhuanyeNumberStart}   ]]>
+            </if>
+            <if test="params.zhuanyeNumberEnd != null and params.zhuanyeNumberEnd != ''">
+                <![CDATA[  and a.zhuanye_number <= #{params.zhuanyeNumberEnd}   ]]>
+            </if>
+             <if test="params.zhuanyeNumber != null and params.zhuanyeNumber != ''">
+                and a.zhuanye_number = #{params.zhuanyeNumber}
+             </if>
+            <if test="params.zhuanyeTypes != null and params.zhuanyeTypes != ''">
+                and a.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+            <if test="params.zhuanyeErjiTypes != null and params.zhuanyeErjiTypes != ''">
+                and a.zhuanye_erji_types = #{params.zhuanyeErjiTypes}
+            </if>
+            <if test=" params.zhuanyeContent != '' and params.zhuanyeContent != null and params.zhuanyeContent != 'null' ">
+                and a.zhuanye_content like CONCAT('%',#{params.zhuanyeContent},'%')
+            </if>
+            <if test="params.zhuanyeDeleteStart != null and params.zhuanyeDeleteStart != ''">
+                <![CDATA[  and a.zhuanye_delete >= #{params.zhuanyeDeleteStart}   ]]>
+            </if>
+            <if test="params.zhuanyeDeleteEnd != null and params.zhuanyeDeleteEnd != ''">
+                <![CDATA[  and a.zhuanye_delete <= #{params.zhuanyeDeleteEnd}   ]]>
+            </if>
+             <if test="params.zhuanyeDelete != null and params.zhuanyeDelete != ''">
+                and a.zhuanye_delete = #{params.zhuanyeDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
